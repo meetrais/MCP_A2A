@@ -1,0 +1,321 @@
+# MCP A2A Trading System - System Configuration
+# Central configuration file for all system components
+
+# =============================================================================
+# SYSTEM INFORMATION
+# =============================================================================
+system:
+  name: "MCP A2A Trading System"
+  version: "1.0.0"
+  description: "Multi-agent financial trading system using MCP servers and A2A protocol"
+  environment: "development"  # development, testing, production
+
+# =============================================================================
+# SERVICE CONFIGURATION
+# =============================================================================
+services:
+  # Portfolio Manager Agent (Main Orchestrator)
+  portfolio_manager:
+    host: "localhost"
+    port: 8000
+    name: "PortfolioManagerAgent"
+    description: "Main orchestrator for trading workflows"
+    
+  # Analyst Agents
+  fundamental_analyst:
+    host: "localhost"
+    port: 8001
+    name: "FundamentalAnalystAgent"
+    description: "Company financial health assessment"
+    
+  technical_analyst:
+    host: "localhost"
+    port: 8002
+    name: "TechnicalAnalystAgent"
+    description: "Price action and market timing analysis"
+    
+  risk_manager:
+    host: "localhost"
+    port: 8003
+    name: "RiskManagerAgent"
+    description: "Trade approval and portfolio risk management"
+    
+  trade_executor:
+    host: "localhost"
+    port: 8004
+    name: "TradeExecutorAgent"
+    description: "Trade execution and confirmation"
+    
+  # MCP Servers
+  market_data_mcp:
+    host: "localhost"
+    port: 9000
+    name: "MarketDataMCP"
+    description: "Simulated financial market data provider"
+    
+  technical_analysis_mcp:
+    host: "localhost"
+    port: 9001
+    name: "TechnicalAnalysisMCP"
+    description: "Technical indicator calculations"
+    
+  trading_execution_mcp:
+    host: "localhost"
+    port: 9002
+    name: "TradingExecutionMCP"
+    description: "Trade execution and portfolio management"
+
+# =============================================================================
+# LOGGING CONFIGURATION
+# =============================================================================
+logging:
+  level: "INFO"  # DEBUG, INFO, WARNING, ERROR, CRITICAL
+  format: "json"  # json, text
+  enable_correlation_ids: true
+  enable_audit_logging: true
+  
+  # Log file configuration
+  file:
+    enabled: false
+    path: "./logs/mcp_a2a_trading.log"
+    max_size_mb: 100
+    backup_count: 5
+    
+  # Console logging
+  console:
+    enabled: true
+    colored: true
+    
+  # Structured logging fields
+  fields:
+    service_name: true
+    timestamp: true
+    correlation_id: true
+    request_id: true
+    user_id: false  # Not applicable for this system
+
+# =============================================================================
+# TRADING CONFIGURATION
+# =============================================================================
+trading:
+  # Portfolio settings
+  portfolio:
+    initial_cash_balance: 100000.0
+    currency: "USD"
+    
+  # Risk management parameters
+  risk_management:
+    max_position_size_percent: 10.0
+    max_sector_concentration_percent: 30.0
+    min_cash_reserve_percent: 20.0
+    max_single_trade_value: 10000.0
+    
+  # Trading simulation settings
+  simulation:
+    enable_paper_trading: true
+    simulate_market_delays: true
+    market_delay_min_ms: 100
+    market_delay_max_ms: 500
+    
+  # Supported sectors for analysis
+  sectors:
+    - "technology"
+    - "healthcare"
+    - "finance"
+    - "energy"
+    - "utilities"
+    - "consumer_goods"
+    - "industrials"
+    - "materials"
+    - "telecommunications"
+    - "real_estate"
+
+# =============================================================================
+# HTTP CLIENT CONFIGURATION
+# =============================================================================
+http_client:
+  # Timeout settings (seconds)
+  timeouts:
+    connect: 10.0
+    read: 30.0
+    write: 10.0
+    pool: 10.0
+    
+  # Retry configuration
+  retry:
+    max_retries: 3
+    backoff_factor: 1.5
+    status_codes: [500, 502, 503, 504]
+    
+  # Connection pooling
+  connection_pool:
+    max_connections: 100
+    max_keepalive_connections: 20
+
+# =============================================================================
+# A2A PROTOCOL CONFIGURATION
+# =============================================================================
+a2a_protocol:
+  version: "2.0"  # JSON-RPC version
+  timeout_seconds: 30.0
+  max_retries: 3
+  
+  # Method mappings for each agent
+  methods:
+    fundamental_analyst:
+      - "analyze_companies"
+      - "get_company_analysis"
+      
+    technical_analyst:
+      - "analyze_ticker"
+      - "get_technical_signals"
+      
+    risk_manager:
+      - "evaluate_trade"
+      - "check_risk_limits"
+      
+    trade_executor:
+      - "execute_trade"
+      - "get_execution_status"
+
+# =============================================================================
+# MCP SERVER CONFIGURATION
+# =============================================================================
+mcp_servers:
+  # Market Data MCP
+  market_data:
+    functions:
+      - "get_stock_price"
+      - "get_market_news"
+      - "get_financial_statements"
+    data_sources:
+      - "simulation"
+      
+  # Technical Analysis MCP
+  technical_analysis:
+    functions:
+      - "calculate_indicator"
+    supported_indicators:
+      - "RSI"
+      - "SMA"
+      - "EMA"
+      - "MACD"
+      - "BOLLINGER_BANDS"
+      
+  # Trading Execution MCP
+  trading_execution:
+    functions:
+      - "execute_mock_trade"
+      - "get_portfolio_status"
+      - "reset_portfolio"
+    trade_types:
+      - "MARKET"
+      - "LIMIT"
+
+# =============================================================================
+# MONITORING AND HEALTH CHECKS
+# =============================================================================
+monitoring:
+  # Health check configuration
+  health_checks:
+    enabled: true
+    interval_seconds: 30
+    timeout_seconds: 10
+    
+  # Metrics collection
+  metrics:
+    enabled: true
+    port: 9090
+    endpoint: "/metrics"
+    
+  # Performance monitoring
+  performance:
+    enabled: true
+    track_response_times: true
+    track_success_rates: true
+    track_throughput: true
+    
+  # Circuit breaker configuration
+  circuit_breaker:
+    failure_threshold: 5
+    recovery_timeout_seconds: 30
+    expected_exceptions:
+      - "httpx.RequestError"
+      - "httpx.TimeoutException"
+
+# =============================================================================
+# SECURITY CONFIGURATION
+# =============================================================================
+security:
+  # CORS settings
+  cors:
+    enabled: true
+    origins:
+      - "http://localhost:3000"
+      - "http://localhost:8080"
+    methods: ["GET", "POST", "PUT", "DELETE"]
+    headers: ["*"]
+    
+  # Rate limiting
+  rate_limiting:
+    enabled: true
+    requests_per_minute: 60
+    
+  # Input validation
+  validation:
+    max_request_size_mb: 10
+    allowed_ticker_pattern: "^[A-Z]{1,5}$"
+    max_trade_quantity: 10000
+
+# =============================================================================
+# CACHING CONFIGURATION
+# =============================================================================
+caching:
+  enabled: true
+  ttl_seconds: 300  # 5 minutes
+  max_size: 1000
+  
+  # Cache keys configuration
+  keys:
+    market_data: "market_data:{ticker}:{date}"
+    technical_analysis: "tech_analysis:{ticker}:{indicator}:{params_hash}"
+    portfolio_status: "portfolio:status"
+
+# =============================================================================
+# DEVELOPMENT CONFIGURATION
+# =============================================================================
+development:
+  # Debug settings
+  debug: false
+  enable_api_docs: true
+  
+  # Auto-reload settings
+  auto_reload: false
+  watch_directories:
+    - "MCP_A2A/"
+    - "config/"
+    
+  # Testing configuration
+  testing:
+    timeout_seconds: 60
+    max_concurrent_requests: 5
+    mock_external_services: false
+
+# =============================================================================
+# PRODUCTION CONFIGURATION
+# =============================================================================
+production:
+  # Worker configuration
+  workers:
+    processes: 1
+    threads: 4
+    
+  # Resource limits
+  resources:
+    max_memory_mb: 1024
+    max_cpu_percent: 80
+    
+  # Deployment settings
+  deployment:
+    health_check_grace_period_seconds: 60
+    shutdown_timeout_seconds: 30

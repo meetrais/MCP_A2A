@@ -1,0 +1,280 @@
+# MCP A2A Trading System - Docker Compose Configuration
+# Orchestrates all services for development and testing
+
+version: '3.8'
+
+services:
+  # =============================================================================
+  # MCP SERVERS
+  # =============================================================================
+  
+  market-data-mcp:
+    build:
+      context: .
+      target: production
+    container_name: mcp-a2a-market-data
+    ports:
+      - "9000:9000"
+    environment:
+      - ENVIRONMENT=docker
+      - LOG_LEVEL=INFO
+      - MARKET_DATA_MCP_PORT=9000
+    command: ["python", "-m", "MCP_A2A.mcp_servers.market_data_server"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+    networks:
+      - trading-network
+
+  technical-analysis-mcp:
+    build:
+      context: .
+      target: production
+    container_name: mcp-a2a-technical-analysis
+    ports:
+      - "9001:9001"
+    environment:
+      - ENVIRONMENT=docker
+      - LOG_LEVEL=INFO
+      - TECHNICAL_ANALYSIS_MCP_PORT=9001
+    command: ["python", "-m", "MCP_A2A.mcp_servers.technical_analysis_server"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+    networks:
+      - trading-network
+
+  trading-execution-mcp:
+    build:
+      context: .
+      target: production
+    container_name: mcp-a2a-trading-execution
+    ports:
+      - "9002:9002"
+    environment:
+      - ENVIRONMENT=docker
+      - LOG_LEVEL=INFO
+      - TRADING_EXECUTION_MCP_PORT=9002
+      - INITIAL_CASH_BALANCE=100000.0
+    command: ["python", "-m", "MCP_A2A.mcp_servers.trading_execution_server"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9002/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+    networks:
+      - trading-network
+
+  # =============================================================================
+  # AGENT SERVICES
+  # =============================================================================
+
+  fundamental-analyst:
+    build:
+      context: .
+      target: production
+    container_name: mcp-a2a-fundamental-analyst
+    ports:
+      - "8001:8001"
+    environment:
+      - ENVIRONMENT=docker
+      - LOG_LEVEL=INFO
+      - FUNDAMENTAL_ANALYST_PORT=8001
+      - MARKET_DATA_MCP_URL=http://market-data-mcp:9000
+    command: ["python", "-m", "MCP_A2A.agents.fundamental_analyst_agent"]
+    depends_on:
+      market-data-mcp:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    restart: unless-stopped
+    networks:
+      - trading-network
+
+  technical-analyst:
+    build:
+      context: .
+      target: production
+    container_name: mcp-a2a-technical-analyst
+    ports:
+      - "8002:8002"
+    environment:
+      - ENVIRONMENT=docker
+      - LOG_LEVEL=INFO
+      - TECHNICAL_ANALYST_PORT=8002
+      - MARKET_DATA_MCP_URL=http://market-data-mcp:9000
+      - TECHNICAL_ANALYSIS_MCP_URL=http://technical-analysis-mcp:9001
+    command: ["python", "-m", "MCP_A2A.agents.technical_analyst_agent"]
+    depends_on:
+      market-data-mcp:
+        condition: service_healthy
+      technical-analysis-mcp:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8002/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    restart: unless-stopped
+    networks:
+      - trading-network
+
+  risk-manager:
+    build:
+      context: .
+      target: production
+    container_name: mcp-a2a-risk-manager
+    ports:
+      - "8003:8003"
+    environment:
+      - ENVIRONMENT=docker
+      - LOG_LEVEL=INFO
+      - RISK_MANAGER_PORT=8003
+      - TRADING_EXECUTION_MCP_URL=http://trading-execution-mcp:9002
+      - MAX_POSITION_SIZE_PERCENT=10.0
+      - MAX_SECTOR_CONCENTRATION_PERCENT=30.0
+      - MIN_CASH_RESERVE_PERCENT=20.0
+    command: ["python", "-m", "MCP_A2A.agents.risk_manager_agent"]
+    depends_on:
+      trading-execution-mcp:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8003/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    restart: unless-stopped
+    networks:
+      - trading-network
+
+  trade-executor:
+    build:
+      context: .
+      target: production
+    container_name: mcp-a2a-trade-executor
+    ports:
+      - "8004:8004"
+    environment:
+      - ENVIRONMENT=docker
+      - LOG_LEVEL=INFO
+      - TRADE_EXECUTOR_PORT=8004
+      - TRADING_EXECUTION_MCP_URL=http://trading-execution-mcp:9002
+    command: ["python", "-m", "MCP_A2A.agents.trade_executor_agent"]
+    depends_on:
+      trading-execution-mcp:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8004/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    restart: unless-stopped
+    networks:
+      - trading-network
+
+  portfolio-manager:
+    build:
+      context: .
+      target: production
+    container_name: mcp-a2a-portfolio-manager
+    ports:
+      - "8000:8000"
+    environment:
+      - ENVIRONMENT=docker
+      - LOG_LEVEL=INFO
+      - PORTFOLIO_MANAGER_PORT=8000
+      - FUNDAMENTAL_ANALYST_URL=http://fundamental-analyst:8001
+      - TECHNICAL_ANALYST_URL=http://technical-analyst:8002
+      - RISK_MANAGER_URL=http://risk-manager:8003
+      - TRADE_EXECUTOR_URL=http://trade-executor:8004
+    command: ["python", "-m", "MCP_A2A.agents.portfolio_manager_agent"]
+    depends_on:
+      fundamental-analyst:
+        condition: service_healthy
+      technical-analyst:
+        condition: service_healthy
+      risk-manager:
+        condition: service_healthy
+      trade-executor:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    restart: unless-stopped
+    networks:
+      - trading-network
+
+  # =============================================================================
+  # MONITORING AND UTILITIES
+  # =============================================================================
+
+  monitoring:
+    build:
+      context: .
+      target: production
+    container_name: mcp-a2a-monitoring
+    ports:
+      - "9090:9090"
+    environment:
+      - ENVIRONMENT=docker
+      - LOG_LEVEL=INFO
+      - ENABLE_METRICS_COLLECTION=true
+      - METRICS_PORT=9090
+    command: ["python", "-m", "MCP_A2A.utils.monitoring"]
+    depends_on:
+      - portfolio-manager
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9090/metrics"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+    networks:
+      - trading-network
+
+# =============================================================================
+# NETWORKS
+# =============================================================================
+
+networks:
+  trading-network:
+    driver: bridge
+    name: mcp-a2a-trading-network
+
+# =============================================================================
+# VOLUMES
+# =============================================================================
+
+volumes:
+  trading-logs:
+    driver: local
+  trading-data:
+    driver: local
+
+# =============================================================================
+# DEVELOPMENT OVERRIDE
+# =============================================================================
+
+# To use development configuration:
+# docker-compose -f docker-compose.yml -f docker-compose.dev.yml up

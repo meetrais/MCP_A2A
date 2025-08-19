@@ -1,0 +1,141 @@
+# MCP A2A Trading System - Development Docker Compose Override
+# Use with: docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+
+version: '3.8'
+
+services:
+  # =============================================================================
+  # DEVELOPMENT OVERRIDES
+  # =============================================================================
+
+  market-data-mcp:
+    build:
+      target: development
+    environment:
+      - ENVIRONMENT=development
+      - DEBUG=true
+      - LOG_LEVEL=DEBUG
+    volumes:
+      - .:/app
+      - trading-logs:/app/logs
+    command: ["uvicorn", "MCP_A2A.mcp_servers.market_data_server:app", "--host", "0.0.0.0", "--port", "9000", "--reload"]
+
+  technical-analysis-mcp:
+    build:
+      target: development
+    environment:
+      - ENVIRONMENT=development
+      - DEBUG=true
+      - LOG_LEVEL=DEBUG
+    volumes:
+      - .:/app
+      - trading-logs:/app/logs
+    command: ["uvicorn", "MCP_A2A.mcp_servers.technical_analysis_server:app", "--host", "0.0.0.0", "--port", "9001", "--reload"]
+
+  trading-execution-mcp:
+    build:
+      target: development
+    environment:
+      - ENVIRONMENT=development
+      - DEBUG=true
+      - LOG_LEVEL=DEBUG
+    volumes:
+      - .:/app
+      - trading-logs:/app/logs
+    command: ["uvicorn", "MCP_A2A.mcp_servers.trading_execution_server:app", "--host", "0.0.0.0", "--port", "9002", "--reload"]
+
+  fundamental-analyst:
+    build:
+      target: development
+    environment:
+      - ENVIRONMENT=development
+      - DEBUG=true
+      - LOG_LEVEL=DEBUG
+    volumes:
+      - .:/app
+      - trading-logs:/app/logs
+    command: ["uvicorn", "MCP_A2A.agents.fundamental_analyst_agent:app", "--host", "0.0.0.0", "--port", "8001", "--reload"]
+
+  technical-analyst:
+    build:
+      target: development
+    environment:
+      - ENVIRONMENT=development
+      - DEBUG=true
+      - LOG_LEVEL=DEBUG
+    volumes:
+      - .:/app
+      - trading-logs:/app/logs
+    command: ["uvicorn", "MCP_A2A.agents.technical_analyst_agent:app", "--host", "0.0.0.0", "--port", "8002", "--reload"]
+
+  risk-manager:
+    build:
+      target: development
+    environment:
+      - ENVIRONMENT=development
+      - DEBUG=true
+      - LOG_LEVEL=DEBUG
+    volumes:
+      - .:/app
+      - trading-logs:/app/logs
+    command: ["uvicorn", "MCP_A2A.agents.risk_manager_agent:app", "--host", "0.0.0.0", "--port", "8003", "--reload"]
+
+  trade-executor:
+    build:
+      target: development
+    environment:
+      - ENVIRONMENT=development
+      - DEBUG=true
+      - LOG_LEVEL=DEBUG
+    volumes:
+      - .:/app
+      - trading-logs:/app/logs
+    command: ["uvicorn", "MCP_A2A.agents.trade_executor_agent:app", "--host", "0.0.0.0", "--port", "8004", "--reload"]
+
+  portfolio-manager:
+    build:
+      target: development
+    environment:
+      - ENVIRONMENT=development
+      - DEBUG=true
+      - LOG_LEVEL=DEBUG
+      - ENABLE_API_DOCS=true
+    volumes:
+      - .:/app
+      - trading-logs:/app/logs
+    command: ["uvicorn", "MCP_A2A.agents.portfolio_manager_agent:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+
+  # =============================================================================
+  # DEVELOPMENT TOOLS
+  # =============================================================================
+
+  jupyter:
+    build:
+      context: .
+      target: development
+    container_name: mcp-a2a-jupyter
+    ports:
+      - "8888:8888"
+    environment:
+      - ENVIRONMENT=development
+      - JUPYTER_ENABLE_LAB=yes
+    volumes:
+      - .:/app
+      - trading-data:/app/data
+    command: ["jupyter", "lab", "--ip=0.0.0.0", "--port=8888", "--no-browser", "--allow-root", "--NotebookApp.token=''"]
+    networks:
+      - trading-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: mcp-a2a-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - trading-network
+
+volumes:
+  redis-data:
+    driver: local

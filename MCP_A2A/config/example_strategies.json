@@ -1,0 +1,220 @@
+{
+  "example_trading_strategies": {
+    "conservative_growth": {
+      "name": "Conservative Growth Strategy",
+      "description": "Focus on stable, dividend-paying stocks with consistent growth",
+      "goal": "Find stable dividend-paying stocks with consistent growth potential",
+      "sector_preference": "utilities",
+      "risk_tolerance": "low",
+      "max_investment": 15000.0,
+      "time_horizon": "long",
+      "expected_return": 0.08,
+      "criteria": {
+        "min_dividend_yield": 0.03,
+        "max_debt_to_equity": 0.5,
+        "min_revenue_growth": 0.05,
+        "min_market_cap": 1000000000
+      }
+    },
+    
+    "tech_growth": {
+      "name": "Technology Growth Strategy",
+      "description": "Aggressive growth strategy focused on technology stocks",
+      "goal": "Find high-growth technology stocks with strong fundamentals",
+      "sector_preference": "technology",
+      "risk_tolerance": "high",
+      "max_investment": 40000.0,
+      "time_horizon": "medium",
+      "expected_return": 0.15,
+      "criteria": {
+        "min_revenue_growth": 0.15,
+        "max_pe_ratio": 30,
+        "min_profit_margin": 0.10,
+        "min_market_cap": 500000000
+      }
+    },
+    
+    "value_investing": {
+      "name": "Value Investing Strategy",
+      "description": "Find undervalued stocks trading below intrinsic value",
+      "goal": "Identify undervalued stocks with strong fundamentals trading below fair value",
+      "sector_preference": "finance",
+      "risk_tolerance": "medium",
+      "max_investment": 25000.0,
+      "time_horizon": "long",
+      "expected_return": 0.12,
+      "criteria": {
+        "max_pe_ratio": 15,
+        "max_pb_ratio": 2.0,
+        "min_roe": 0.12,
+        "min_current_ratio": 1.5
+      }
+    },
+    
+    "momentum_trading": {
+      "name": "Momentum Trading Strategy",
+      "description": "Short-term momentum trading based on technical indicators",
+      "goal": "Capitalize on short-term price momentum using technical analysis",
+      "sector_preference": "technology",
+      "risk_tolerance": "high",
+      "max_investment": 20000.0,
+      "time_horizon": "short",
+      "expected_return": 0.20,
+      "criteria": {
+        "min_rsi": 30,
+        "max_rsi": 70,
+        "min_volume": 1000000,
+        "technical_signals": ["RSI", "MACD", "SMA"]
+      }
+    },
+    
+    "dividend_income": {
+      "name": "Dividend Income Strategy",
+      "description": "Focus on high-dividend yield stocks for income generation",
+      "goal": "Build a portfolio of high-dividend yield stocks for steady income",
+      "sector_preference": "utilities",
+      "risk_tolerance": "low",
+      "max_investment": 30000.0,
+      "time_horizon": "long",
+      "expected_return": 0.06,
+      "criteria": {
+        "min_dividend_yield": 0.05,
+        "max_payout_ratio": 0.8,
+        "min_dividend_growth": 0.03,
+        "min_years_dividend": 10
+      }
+    },
+    
+    "healthcare_growth": {
+      "name": "Healthcare Growth Strategy",
+      "description": "Growth-oriented healthcare and biotech investments",
+      "goal": "Invest in innovative healthcare companies with strong growth prospects",
+      "sector_preference": "healthcare",
+      "risk_tolerance": "medium",
+      "max_investment": 35000.0,
+      "time_horizon": "medium",
+      "expected_return": 0.14,
+      "criteria": {
+        "min_revenue_growth": 0.12,
+        "min_rd_spending": 0.15,
+        "min_pipeline_value": 1000000000,
+        "max_clinical_risk": "medium"
+      }
+    },
+    
+    "esg_investing": {
+      "name": "ESG Sustainable Investing",
+      "description": "Environmental, Social, and Governance focused investing",
+      "goal": "Invest in companies with strong ESG ratings and sustainable practices",
+      "sector_preference": "energy",
+      "risk_tolerance": "medium",
+      "max_investment": 25000.0,
+      "time_horizon": "long",
+      "expected_return": 0.10,
+      "criteria": {
+        "min_esg_score": 80,
+        "renewable_energy_focus": true,
+        "carbon_neutral_commitment": true,
+        "board_diversity": 0.3
+      }
+    },
+    
+    "small_cap_growth": {
+      "name": "Small Cap Growth Strategy",
+      "description": "High-growth potential small capitalization stocks",
+      "goal": "Find small-cap companies with exceptional growth potential",
+      "sector_preference": "technology",
+      "risk_tolerance": "high",
+      "max_investment": 15000.0,
+      "time_horizon": "medium",
+      "expected_return": 0.18,
+      "criteria": {
+        "max_market_cap": 2000000000,
+        "min_revenue_growth": 0.20,
+        "min_profit_margin": 0.05,
+        "max_debt_to_equity": 0.3
+      }
+    }
+  },
+  
+  "risk_profiles": {
+    "conservative": {
+      "max_position_size": 0.05,
+      "max_sector_concentration": 0.20,
+      "min_cash_reserve": 0.30,
+      "max_volatility": 0.15,
+      "preferred_sectors": ["utilities", "consumer_goods", "healthcare"]
+    },
+    
+    "moderate": {
+      "max_position_size": 0.10,
+      "max_sector_concentration": 0.30,
+      "min_cash_reserve": 0.20,
+      "max_volatility": 0.25,
+      "preferred_sectors": ["finance", "healthcare", "technology", "industrials"]
+    },
+    
+    "aggressive": {
+      "max_position_size": 0.15,
+      "max_sector_concentration": 0.40,
+      "min_cash_reserve": 0.10,
+      "max_volatility": 0.40,
+      "preferred_sectors": ["technology", "energy", "materials", "telecommunications"]
+    }
+  },
+  
+  "market_conditions": {
+    "bull_market": {
+      "description": "Rising market with positive sentiment",
+      "strategy_adjustments": {
+        "increase_equity_allocation": 0.10,
+        "favor_growth_stocks": true,
+        "reduce_cash_reserves": 0.05
+      }
+    },
+    
+    "bear_market": {
+      "description": "Declining market with negative sentiment",
+      "strategy_adjustments": {
+        "increase_cash_reserves": 0.15,
+        "favor_defensive_stocks": true,
+        "reduce_position_sizes": 0.05
+      }
+    },
+    
+    "sideways_market": {
+      "description": "Range-bound market with mixed signals",
+      "strategy_adjustments": {
+        "favor_dividend_stocks": true,
+        "maintain_balanced_allocation": true,
+        "focus_on_value_opportunities": true
+      }
+    }
+  },
+  
+  "technical_indicators": {
+    "trend_following": {
+      "indicators": ["SMA", "EMA", "MACD"],
+      "signals": {
+        "buy": "price_above_sma_20 AND macd_positive",
+        "sell": "price_below_sma_20 AND macd_negative"
+      }
+    },
+    
+    "mean_reversion": {
+      "indicators": ["RSI", "BOLLINGER_BANDS"],
+      "signals": {
+        "buy": "rsi_below_30 AND price_near_lower_band",
+        "sell": "rsi_above_70 AND price_near_upper_band"
+      }
+    },
+    
+    "momentum": {
+      "indicators": ["RSI", "MACD", "STOCHASTIC"],
+      "signals": {
+        "buy": "rsi_rising AND macd_bullish_crossover",
+        "sell": "rsi_falling AND macd_bearish_crossover"
+      }
+    }
+  }
+}
